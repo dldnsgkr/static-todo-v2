@@ -27,12 +27,6 @@ jobs:
         with:
           ref: ${{ inputs.checkout_ref || github.ref_name }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
       - name: Resolve base path
         id: base
         run: |
@@ -53,33 +47,23 @@ jobs:
             echo "base=/${REPO}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npx vite build --base=${{ steps.base.outputs.path }}
-        env:
-          BASE_PATH: ${{ steps.base.outputs.path }}
-          PUBLIC_URL: ${{ steps.base.outputs.path }}
-          QEPLOY_BASE_PATH: ${{ steps.base.outputs.base }}
-
       - name: Copy index.html to 404.html
         run: |
-          [ -f ./dist/index.html ] && cp ./dist/index.html ./dist/404.html || true
+          [ -f ./index.html ] && cp ./index.html ./404.html || true
 
       - name: Preserve custom domain
         run: |
-          mkdir -p ./dist
+          mkdir -p .
           CNAME="${{ steps.base.outputs.cname }}"
           if [ -n "$CNAME" ]; then
-            printf '%s\n' "$CNAME" > ./dist/CNAME
+            printf '%s\n' "$CNAME" > ./CNAME
             echo "GitHub Pages custom domain CNAME 파일 생성 완료"
             exit 0
           fi
           if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
             if git fetch origin gh-pages --depth=1; then
               if git show FETCH_HEAD:CNAME > /tmp/qeploy-cname 2>/dev/null; then
-                cp /tmp/qeploy-cname ./dist/CNAME
+                cp /tmp/qeploy-cname ./CNAME
                 echo "기존 CNAME 파일 보존 완료"
               else
                 echo "기존 CNAME 파일 없음"
@@ -95,4 +79,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: .
