@@ -310,3 +310,11 @@ body {
     padding: 13px;
   }
 }
+
+/* ===== 완료 개수 표시 ===== */
+.done-count {
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}

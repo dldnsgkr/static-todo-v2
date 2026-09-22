@@ -8,6 +8,7 @@
   var input = document.getElementById("todo-input");
   var listEl = document.getElementById("todo-list");
   var emptyEl = document.getElementById("empty-state");
+  var doneCountEl = document.getElementById("done-count");
   var countEl = document.getElementById("count-text");
   var clearDoneBtn = document.getElementById("clear-done");
 
@@ -85,6 +86,8 @@
   function updateMeta() {
     var remaining = todos.filter(function (t) { return !t.done; }).length;
     var doneCount = todos.length - remaining;
+
+    doneCountEl.textContent = "완료된 할 일: " + doneCount + "개";
 
     countEl.textContent =
       todos.length === 0
