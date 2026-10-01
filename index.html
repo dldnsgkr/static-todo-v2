@@ -22,6 +22,12 @@
         maxlength="200"
         aria-label="새 할 일 입력"
       />
+      <input
+        id="todo-due"
+        class="todo-due"
+        type="date"
+        aria-label="마감일 선택"
+      />
       <button type="submit" class="add-btn" aria-label="할 일 등록">등록</button>
     </form>
 
@@ -41,6 +47,10 @@
       <button id="clear-done" class="clear-btn" type="button" hidden>완료 항목 삭제</button>
     </footer>
   </main>
+
+  <footer class="page-footer">
+    <p class="copyright">© <span id="copyright-year"></span> 오늘의 할 일</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
