@@ -6,10 +6,18 @@
 
   var form = document.getElementById("todo-form");
   var input = document.getElementById("todo-input");
+  var dueInput = document.getElementById("todo-due");
   var listEl = document.getElementById("todo-list");
   var emptyEl = document.getElementById("empty-state");
+  var doneCountEl = document.getElementById("done-count");
   var countEl = document.getElementById("count-text");
   var clearDoneBtn = document.getElementById("clear-done");
+  var yearEl = document.getElementById("copyright-year");
+
+  // --- 푸터 연도: 시스템 날짜에서 동적으로 계산 ---
+  if (yearEl) {
+    yearEl.textContent = new Date().getFullYear();
+  }
 
   // --- 상태 ---
   var todos = loadTodos();
@@ -19,11 +27,16 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       var parsed = raw ? JSON.parse(raw) : [];
       if (!Array.isArray(parsed)) return [];
-      // 데이터 형태 방어: {id, text, done} 만 통과
+      // 데이터 형태 방어: {id, text, done, due} 만 통과
       return parsed.filter(function (t) {
         return t && typeof t.text === "string";
       }).map(function (t) {
-        return { id: t.id || createId(), text: t.text, done: !!t.done };
+        return {
+          id: t.id || createId(),
+          text: t.text,
+          done: !!t.done,
+          due: typeof t.due === "string" ? t.due : ""
+        };
       });
     } catch (e) {
       return [];
@@ -40,6 +53,33 @@
 
   function createId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  // --- 마감일 표시 유틸 ---
+  function startOfToday() {
+    var now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  function parseDue(iso) {
+    if (!iso) return null;
+    var d = new Date(iso + "T00:00:00");
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function isOverdue(iso) {
+    var d = parseDue(iso);
+    return !!d && d.getTime() < startOfToday().getTime();
+  }
+
+  function formatDue(iso) {
+    var d = parseDue(iso);
+    if (!d) return "마감일 있음";
+    var label = d.toLocaleDateString("ko-KR", { month: "long", day: "numeric" });
+    if (d.getFullYear() !== new Date().getFullYear()) {
+      label = d.getFullYear() + "년 " + label;
+    }
+    return "마감 " + label;
   }
 
   // --- 렌더링 ---
@@ -75,6 +115,15 @@
 
       li.appendChild(checkbox);
       li.appendChild(text);
+
+      if (todo.due) {
+        var due = document.createElement("span");
+        due.className = "due-badge" + (!todo.done && isOverdue(todo.due) ? " overdue" : "");
+        due.textContent = formatDue(todo.due);
+        due.title = "마감일: " + todo.due;
+        li.appendChild(due);
+      }
+
       li.appendChild(deleteBtn);
       listEl.appendChild(li);
     });
@@ -86,6 +135,8 @@
     var remaining = todos.filter(function (t) { return !t.done; }).length;
     var doneCount = todos.length - remaining;
 
+    doneCountEl.textContent = "완료된 할 일: " + doneCount + "개";
+
     countEl.textContent =
       todos.length === 0
         ? "할 일 없음"
@@ -96,17 +147,24 @@
   }
 
   // --- 동작 ---
-  function addTodo(text) {
+  function addTodo(text, due) {
     var trimmed = text.trim();
     if (!trimmed) return;
-    todos.unshift({ id: createId(), text: trimmed, done: false });
+    todos.unshift({
+      id: createId(),
+      text: trimmed,
+      done: false,
+      due: (due || "").trim()
+    });
     saveTodos();
     render();
   }
 
   function toggleTodo(id) {
     todos = todos.map(function (t) {
-      return t.id === id ? { id: t.id, text: t.text, done: !t.done } : t;
+      return t.id === id
+        ? { id: t.id, text: t.text, done: !t.done, due: t.due }
+        : t;
     });
     saveTodos();
     render();
@@ -137,8 +195,9 @@
   // --- 이벤트 ---
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    addTodo(input.value);
+    addTodo(input.value, dueInput.value);
     input.value = "";
+    dueInput.value = "";
     input.focus();
   });
 

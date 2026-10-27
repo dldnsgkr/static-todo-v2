@@ -22,7 +22,13 @@
         maxlength="200"
         aria-label="새 할 일 입력"
       />
-      <button type="submit" class="add-btn" aria-label="할 일 추가">추가</button>
+      <input
+        id="todo-due"
+        class="todo-due"
+        type="date"
+        aria-label="마감일 선택"
+      />
+      <button type="submit" class="add-btn" aria-label="할 일 등록">등록</button>
     </form>
 
     <section class="list-wrap">
@@ -32,6 +38,8 @@
         <span class="empty-icon">✔️</span>
         <p>할 일이 없습니다.<br />첫 번째 할 일을 추가해 보세요!</p>
       </div>
+
+      <p id="done-count" class="done-count" aria-live="polite">완료된 할 일: 0개</p>
     </section>
 
     <footer class="app-footer">
@@ -39,6 +47,10 @@
       <button id="clear-done" class="clear-btn" type="button" hidden>완료 항목 삭제</button>
     </footer>
   </main>
+
+  <footer class="page-footer">
+    <p class="copyright">© <span id="copyright-year"></span> 오늘의 할 일</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
