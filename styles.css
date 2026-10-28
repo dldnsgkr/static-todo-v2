@@ -147,11 +147,10 @@ body {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .todo-item {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -161,23 +160,6 @@ body {
   border-radius: var(--radius);
   transition: box-shadow 0.2s, border-color 0.2s, opacity 0.25s, transform 0.25s;
   animation: slide-in 0.25s ease;
-}
-
-/* 각 항목 카드 바로 아래에 표시되는 안내 문구 */
-.todo-item::after {
-  content: "데모 화면";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translate(-50%, 4px);
-  font-size: 10px;
-  font-weight: 600;
-  color: #aab2c5;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
 }
 
 .todo-item:hover {
